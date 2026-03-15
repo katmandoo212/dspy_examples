@@ -27,11 +27,22 @@ A collection of Python scripts demonstrating DSPy prompt optimization techniques
 
 ### BootstrapFewShot Optimization
 
+After running `uv sync` (which installs the package), use one of these methods:
+
 ```bash
+# Method 1: Using uv run (recommended)
+uv run python main.py
+
+# Method 2: Using the installed package
+uv run python -m dspy_examples.bootstrap_fewshot
+
+# Method 3: With pip-installed environment
 python main.py
 # or
 python -m dspy_examples.bootstrap_fewshot
 ```
+
+> **Note**: This project uses a `src/` layout. The package must be installed (via `uv sync` or `pip install -e .`) for Python to find it. If you see `ModuleNotFoundError: No module named 'dspy_examples'`, run `uv sync` first.
 
 This reads from `prompts/unoptimized_prompt.md` and writes the optimized version to `prompts/optimized_prompt.md` (or `optimized_prompt_XX.md` if file exists).
 
@@ -68,8 +79,11 @@ Each technique should be a self-contained script in `src/dspy_examples/`:
 ## Running Tests
 
 ```bash
-# Run all tests
+# Run all tests (using uv run handles the src/ layout)
 uv run pytest tests/ -v
+
+# Alternative: Set PYTHONPATH manually
+PYTHONPATH=src pytest tests/ -v
 
 # Run unit tests only (skip integration tests)
 uv run pytest tests/ -v -m "not integration"

@@ -25,4 +25,4 @@ python_files = ["test_*.py"]
 python_functions = ["test_*"]
 
 [tool.hatch.build.targets.wheel]
-packages = ["."]
+packages = ["src/dspy_examples"]

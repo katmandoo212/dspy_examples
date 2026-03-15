@@ -36,9 +36,11 @@ uv sync
 ### Run the Optimization
 
 ```bash
-python main.py
-# or
-PYTHONPATH=src uv run python -m dspy_examples.bootstrap_fewshot
+# Recommended: Use uv run (handles src/ layout automatically)
+uv run python main.py
+
+# Alternative: With package installed
+uv sync && python main.py
 ```
 
 ## Project Structure
@@ -82,15 +84,63 @@ When testing modules that use `dspy.configure()`:
 
 ### BootstrapFewShot
 
-The `metric` function in BootstrapFewShot should evaluate optimization quality:
+**Critical: Training examples must specify inputs with `.with_inputs()`**
+
 ```python
-# Placeholder (accepts all examples)
+# WRONG - Will fail with "Inputs have not been set for this example"
+trainset=[
+    dspy.Example(question="What is 2+2?", answer="4")
+]
+
+# CORRECT - Specify which fields are inputs
+trainset=[
+    dspy.Example(question="What is 2+2?", answer="4").with_inputs("question")
+]
+```
+
+**Critical: Metric function requires 3 arguments**
+
+The metric function signature must be `metric(example, prediction, trace=None)`:
+
+```python
+# WRONG - Only 2 arguments, causes "takes 2 positional arguments but 3 were given"
 metric=lambda x, y: True
 
-# Production (evaluate quality)
-def metric(example, prediction):
-    # Return True if prediction is good quality
-    return some_quality_check(prediction)
+# CORRECT - 3 arguments with optional trace
+def metric(example, prediction, trace=None):
+    """Evaluate if the prediction is acceptable."""
+    return True  # Accept all for demo purposes
+
+# Production metric - evaluate quality
+def quality_metric(example, prediction, trace=None):
+    # Check if prediction matches expected output
+    return prediction.answer == example.answer
+```
+
+**Complete BootstrapFewShot example:**
+
+```python
+from dspy.teleprompt import BootstrapFewShot
+
+def metric(example, prediction, trace=None):
+    # Evaluate prediction quality
+    return True
+
+optimizer = BootstrapFewShot(
+    metric=metric,
+    max_bootstrapped_demos=3,
+    max_labeled_demos=3,
+)
+
+optimized = optimizer.compile(
+    my_module,
+    trainset=[
+        dspy.Example(
+            unoptimized_prompt="Write a greeting.",
+            optimized_prompt="Write a greeting.\n\nExample: ..."
+        ).with_inputs("unoptimized_prompt")
+    ],
+)
 ```
 
 ## Adding New Optimization Techniques

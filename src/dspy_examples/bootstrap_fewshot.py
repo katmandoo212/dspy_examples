@@ -52,14 +52,14 @@ def optimize_prompt(
     module = PromptOptimizer()
 
     # Compile with example prompt
-    # In real usage, you'd provide training examples
+    # In real usage, you'd provide training examples with proper input specification
     optimized_module = optimizer.compile(
         module,
         trainset=[
             dspy.Example(
                 unoptimized_prompt="Write a greeting.",
                 optimized_prompt="Write a greeting.\n\nExample:\nInput: Write a greeting for a friend.\nOutput: Hey there! Great to see you again!",
-            )
+            ).with_inputs("unoptimized_prompt")
         ],
     )
 

@@ -11,13 +11,7 @@ class TestLoadConfig:
 
     def test_load_config_returns_model_name(self) -> None:
         """Test that load_config returns the configured model name."""
-        # Clear only the specific env vars we want to test defaults for
-        env_patch = patch.dict(
-            os.environ,
-            {},
-            clear=False
-        )
-        # Remove OLLAMA_MODEL to test default
+        # Remove env vars to test defaults
         model_value = os.environ.pop("OLLAMA_MODEL", None)
         base_url_value = os.environ.pop("OLLAMA_BASE_URL", None)
 

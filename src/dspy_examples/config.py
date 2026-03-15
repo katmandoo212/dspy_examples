@@ -1,37 +1,40 @@
-"""DSPy configuration module for Ollama integration."""
-
-import os
-from typing import Any
+"""DSPy configuration module for backward compatibility."""
 
 import dspy
-from dotenv import load_dotenv
+from dspy_examples.settings import get_settings
 
 
-def load_config() -> dict[str, Any]:
+def load_config() -> dict[str, str]:
     """Load configuration from environment variables.
 
     Returns:
         Dictionary with model, base_url, and other settings.
-    """
-    load_dotenv()
 
+    Note:
+        This function is kept for backward compatibility.
+        Prefer using get_settings() for new code.
+    """
+    settings = get_settings()
     return {
-        "model": os.getenv("OLLAMA_MODEL", "gpt-oss:120b-cloud"),
-        "base_url": os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"),
+        "model": settings.ollama_model,
+        "base_url": settings.ollama_base_url,
     }
 
 
 def configure_dspy() -> dspy.LM:
-    """Configure DSPy to use Ollama language model.
+    """Configure DSPy to use the configured language model.
 
     Returns:
         Configured dspy.LM instance.
-    """
-    config = load_config()
 
-    lm = dspy.LM(
-        model=f"ollama_chat/{config['model']}",
-        api_base=config["base_url"],
-    )
+    Note:
+        This function is kept for backward compatibility.
+        Prefer using ProviderFactory.create() for new code.
+    """
+    from dspy_examples.factory.provider_factory import ProviderFactory
+
+    settings = get_settings()
+    provider = ProviderFactory.create(settings.llm_provider)
+    lm = provider.create_lm()
     dspy.configure(lm=lm)
     return lm

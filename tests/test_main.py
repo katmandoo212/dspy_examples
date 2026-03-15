@@ -10,13 +10,22 @@ class TestMain:
 
     def test_main_module_imports(self) -> None:
         """Test that main module imports successfully."""
-        from dspy_examples import bootstrap_fewshot
+        from dspy_examples import (
+            get_settings,
+            OptimizationPipeline,
+            PipelineConfig,
+            ProviderFactory,
+            OptimizerFactory,
+        )
 
-        assert hasattr(bootstrap_fewshot, "main")
-        assert hasattr(bootstrap_fewshot, "optimize_prompt")
+        assert callable(get_settings)
+        assert OptimizationPipeline is not None
+        assert PipelineConfig is not None
+        assert ProviderFactory is not None
+        assert OptimizerFactory is not None
 
-    def test_main_has_run_function(self) -> None:
-        """Test that main.py has run function."""
-        from main import run
+    def test_main_has_main_function(self) -> None:
+        """Test that main.py has main function."""
+        from main import main
 
-        assert callable(run)
+        assert callable(main)

@@ -26,13 +26,11 @@ class PromptOptimizer(dspy.Module):
 
 def optimize_prompt(
     prompt: str,
-    num_threads: int = 4,
 ) -> str:
     """Optimize a prompt using BootstrapFewShot.
 
     Args:
         prompt: The unoptimized prompt text.
-        num_threads: Number of threads for parallel processing.
 
     Returns:
         The optimized prompt with few-shot examples.
@@ -41,8 +39,11 @@ def optimize_prompt(
 
     configure_dspy()
 
+    # Note: The metric function currently accepts all examples (lambda x, y: True).
+    # In production, you would provide a proper metric function that evaluates
+    # whether the optimization improved the prompt quality.
     optimizer = BootstrapFewShot(
-        metric=lambda x, y: True,  # Accept all examples for now
+        metric=lambda x, y: True,  # Accept all examples for demo purposes
         max_bootstrapped_demos=3,
         max_labeled_demos=3,
     )

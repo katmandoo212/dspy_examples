@@ -39,11 +39,15 @@ def optimize_prompt(
 
     configure_dspy()
 
-    # Note: The metric function currently accepts all examples (lambda x, y: True).
-    # In production, you would provide a proper metric function that evaluates
-    # whether the optimization improved the prompt quality.
+    # Note: The metric function should evaluate whether the optimization
+    # produced a good result. For this demo, we accept all bootstrapped demos.
+    # In production, implement a proper metric that evaluates output quality.
+    def metric(example, prediction, trace=None):
+        """Accept all bootstrapped demonstrations for demo purposes."""
+        return True
+
     optimizer = BootstrapFewShot(
-        metric=lambda x, y: True,  # Accept all examples for demo purposes
+        metric=metric,
         max_bootstrapped_demos=3,
         max_labeled_demos=3,
     )

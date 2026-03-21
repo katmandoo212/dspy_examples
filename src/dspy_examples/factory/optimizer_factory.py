@@ -2,6 +2,7 @@
 
 from dspy_examples.optimizers.base import PromptOptimizer, OptimizerConfig
 from dspy_examples.optimizers.bootstrap_fewshot import BootstrapFewShotOptimizer
+from dspy_examples.optimizers.bootstrap_random import BootstrapRandomOptimizer
 
 
 class OptimizerFactory:
@@ -9,6 +10,7 @@ class OptimizerFactory:
 
     _optimizers: dict[str, type[PromptOptimizer]] = {
         "bootstrap_fewshot": BootstrapFewShotOptimizer,
+        "bootstrap_random": BootstrapRandomOptimizer,
     }
 
     @classmethod
@@ -64,7 +66,8 @@ class OptimizerFactory:
         Returns:
             A PromptOptimizer instance.
         """
-        # Simple heuristic: use bootstrap_fewshot for prompts < 1000 chars
-        if len(prompt) < 1000:
-            return cls.create("bootstrap_fewshot")
+        # Use bootstrap_random for longer prompts (more complex optimization)
+        # Use bootstrap_fewshot for shorter prompts (faster)
+        if len(prompt) > 1000:
+            return cls.create("bootstrap_random")
         return cls.create("bootstrap_fewshot")

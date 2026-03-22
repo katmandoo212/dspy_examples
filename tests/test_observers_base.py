@@ -181,3 +181,27 @@ class TestObserver:
         tracker.on_pipeline_event(event)
 
         assert tracker.stages == ["optimize"]
+
+    def test_observer_metric_handler(self):
+        """Test observer metric event handler."""
+        from dspy_examples.observers.base import Observer, MetricEvent
+
+        class MetricCollector(Observer):
+            def __init__(self):
+                self.metrics = []
+
+            def on_metric_event(self, event: MetricEvent) -> None:
+                self.metrics.append((event.name, event.value, event.unit))
+
+        collector = MetricCollector()
+        event = MetricEvent(
+            name="tokens_used",
+            timestamp=datetime.now(),
+            source="optimizer",
+            data={},
+            value=1500,
+            unit="tokens",
+        )
+        collector.on_metric_event(event)
+
+        assert collector.metrics == [("tokens_used", 1500, "tokens")]

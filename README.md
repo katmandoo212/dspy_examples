@@ -4,7 +4,7 @@ A Python project demonstrating DSPy prompt optimization techniques using Gang of
 
 ## Features
 
-- **Multiple Optimizers**: BootstrapFewShot and BootstrapFewShotWithRandomSearch
+- **Multiple Optimizers**: BootstrapFewShot, BootstrapRandom, MIPROv2, GEPA, BetterTogether
 - **Multiple LLM Providers**: Ollama, OpenAI, Anthropic, Google, OpenRouter
 - **Factory Pattern**: Easy creation of providers and optimizers
 - **Pipeline Pattern**: Standard optimization workflow with caching
@@ -128,6 +128,8 @@ print(OptimizerFactory.list_optimizers())
 | BootstrapFewShot | `bootstrap_fewshot` | Adds few-shot examples using DSPy's teleprompter |
 | BootstrapRandom | `bootstrap_random` | Uses random search to find optimal demonstration combinations |
 | MIPROv2 | `mipro_v2` | Uses Bayesian optimization for instructions and few-shot examples |
+| GEPA | `gepa` | Reflective prompt evolution with Pareto-based candidate selection |
+| BetterTogether | `better_together` | Combines prompt optimization with fine-tuning for compound improvements |
 
 ### Available Providers
 
@@ -158,7 +160,9 @@ dspy_examples/
 │   │   ├── base.py              # PromptOptimizer interface
 │   │   ├── bootstrap_fewshot.py
 │   │   ├── bootstrap_random.py
-│   │   └── mipro_v2.py
+│   │   ├── mipro_v2.py
+│   │   ├── gepa.py
+│   │   └── better_together.py
 │   ├── factory/                 # Factory Pattern
 │   │   ├── provider_factory.py
 │   │   └── optimizer_factory.py

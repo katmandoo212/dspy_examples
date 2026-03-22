@@ -4,6 +4,8 @@ from dspy_examples.optimizers.base import PromptOptimizer, OptimizerConfig
 from dspy_examples.optimizers.bootstrap_fewshot import BootstrapFewShotOptimizer
 from dspy_examples.optimizers.bootstrap_random import BootstrapRandomOptimizer
 from dspy_examples.optimizers.mipro_v2 import MIPROv2Optimizer
+from dspy_examples.optimizers.gepa import GEPAOptimizer
+from dspy_examples.optimizers.better_together import BetterTogetherOptimizer
 
 
 class OptimizerFactory:
@@ -13,6 +15,8 @@ class OptimizerFactory:
         "bootstrap_fewshot": BootstrapFewShotOptimizer,
         "bootstrap_random": BootstrapRandomOptimizer,
         "mipro_v2": MIPROv2Optimizer,
+        "gepa": GEPAOptimizer,
+        "better_together": BetterTogetherOptimizer,
     }
 
     @classmethod

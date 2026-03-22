@@ -12,6 +12,8 @@ def test_optimizer_factory_list_optimizers():
     assert "bootstrap_fewshot" in optimizers
     assert "bootstrap_random" in optimizers
     assert "mipro_v2" in optimizers
+    assert "gepa" in optimizers
+    assert "better_together" in optimizers
 
 
 def test_optimizer_factory_create_bootstrap_fewshot():
@@ -46,6 +48,31 @@ def test_optimizer_factory_create_mipro_v2():
     assert isinstance(optimizer, MIPROv2Optimizer)
     assert optimizer.get_name() == "mipro_v2"
     assert optimizer.get_auto_mode() == "medium"
+
+
+def test_optimizer_factory_create_gepa():
+    """Test creating GEPA optimizer via factory."""
+    from dspy_examples.factory.optimizer_factory import OptimizerFactory
+    from dspy_examples.optimizers.gepa import GEPAOptimizer
+
+    optimizer = OptimizerFactory.create("gepa")
+
+    assert isinstance(optimizer, GEPAOptimizer)
+    assert optimizer.get_name() == "gepa"
+    assert optimizer.get_auto_mode() == "medium"
+
+
+def test_optimizer_factory_create_better_together():
+    """Test creating BetterTogether optimizer via factory."""
+    from dspy_examples.factory.optimizer_factory import OptimizerFactory
+    from dspy_examples.optimizers.better_together import BetterTogetherOptimizer
+
+    optimizer = OptimizerFactory.create("better_together")
+
+    assert isinstance(optimizer, BetterTogetherOptimizer)
+    assert optimizer.get_name() == "better_together"
+    assert optimizer.get_strategy() == "p -> w"
+    assert optimizer.get_prompt_optimizer() == "bootstrap_random"
 
 
 def test_optimizer_factory_create_with_config():

@@ -7,6 +7,7 @@ from dspy_examples.observers.base import (
     MetricEvent,
 )
 from dspy_examples.observers.logging_observer import LoggingObserver
+from dspy_examples.observers.metric_observer import MetricObserver
 
 __all__ = [
     "Observer",
@@ -14,4 +15,5 @@ __all__ = [
     "PipelineEvent",
     "MetricEvent",
     "LoggingObserver",
+    "MetricObserver",
 ]

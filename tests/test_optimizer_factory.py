@@ -11,6 +11,7 @@ def test_optimizer_factory_list_optimizers():
 
     assert "bootstrap_fewshot" in optimizers
     assert "bootstrap_random" in optimizers
+    assert "mipro_v2" in optimizers
 
 
 def test_optimizer_factory_create_bootstrap_fewshot():
@@ -33,6 +34,18 @@ def test_optimizer_factory_create_bootstrap_random():
 
     assert isinstance(optimizer, BootstrapRandomOptimizer)
     assert optimizer.get_name() == "bootstrap_random"
+
+
+def test_optimizer_factory_create_mipro_v2():
+    """Test creating MIPROv2 optimizer via factory."""
+    from dspy_examples.factory.optimizer_factory import OptimizerFactory
+    from dspy_examples.optimizers.mipro_v2 import MIPROv2Optimizer
+
+    optimizer = OptimizerFactory.create("mipro_v2")
+
+    assert isinstance(optimizer, MIPROv2Optimizer)
+    assert optimizer.get_name() == "mipro_v2"
+    assert optimizer.get_auto_mode() == "medium"
 
 
 def test_optimizer_factory_create_with_config():

@@ -3,6 +3,7 @@
 from dspy_examples.optimizers.base import PromptOptimizer, OptimizationResult, OptimizerConfig
 from dspy_examples.optimizers.bootstrap_fewshot import BootstrapFewShotOptimizer
 from dspy_examples.optimizers.bootstrap_random import BootstrapRandomOptimizer
+from dspy_examples.optimizers.mipro_v2 import MIPROv2Optimizer
 
 __all__ = [
     "PromptOptimizer",
@@ -10,4 +11,5 @@ __all__ = [
     "OptimizerConfig",
     "BootstrapFewShotOptimizer",
     "BootstrapRandomOptimizer",
+    "MIPROv2Optimizer",
 ]

@@ -3,6 +3,7 @@
 from dspy_examples.optimizers.base import PromptOptimizer, OptimizerConfig
 from dspy_examples.optimizers.bootstrap_fewshot import BootstrapFewShotOptimizer
 from dspy_examples.optimizers.bootstrap_random import BootstrapRandomOptimizer
+from dspy_examples.optimizers.mipro_v2 import MIPROv2Optimizer
 
 
 class OptimizerFactory:
@@ -11,6 +12,7 @@ class OptimizerFactory:
     _optimizers: dict[str, type[PromptOptimizer]] = {
         "bootstrap_fewshot": BootstrapFewShotOptimizer,
         "bootstrap_random": BootstrapRandomOptimizer,
+        "mipro_v2": MIPROv2Optimizer,
     }
 
     @classmethod

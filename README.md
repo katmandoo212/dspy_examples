@@ -127,6 +127,7 @@ print(OptimizerFactory.list_optimizers())
 |----------|------|-------------|
 | BootstrapFewShot | `bootstrap_fewshot` | Adds few-shot examples using DSPy's teleprompter |
 | BootstrapRandom | `bootstrap_random` | Uses random search to find optimal demonstration combinations |
+| MIPROv2 | `mipro_v2` | Uses Bayesian optimization for instructions and few-shot examples |
 
 ### Available Providers
 
@@ -156,7 +157,8 @@ dspy_examples/
 │   ├── optimizers/              # Optimization Strategies
 │   │   ├── base.py              # PromptOptimizer interface
 │   │   ├── bootstrap_fewshot.py
-│   │   └── bootstrap_random.py
+│   │   ├── bootstrap_random.py
+│   │   └── mipro_v2.py
 │   ├── factory/                 # Factory Pattern
 │   │   ├── provider_factory.py
 │   │   └── optimizer_factory.py

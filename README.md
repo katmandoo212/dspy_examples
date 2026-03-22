@@ -2,14 +2,42 @@
 
 A Python project demonstrating DSPy prompt optimization techniques using Gang of Four design patterns for extensibility.
 
+## Table of Contents
+
+- [Features](#features)
+- [Architecture](#architecture)
+- [Setup](#setup)
+- [Usage](#usage)
+  - [Basic Usage](#basic-usage)
+  - [Explicit Configuration](#explicit-configuration)
+  - [Using Factory Directly](#using-factory-directly)
+  - [Variable Substitution](#variable-substitution)
+  - [Batch Processing](#batch-processing)
+    - [Multiple Prompts, Single Provider](#multiple-prompts-single-provider)
+    - [Single Template, Multiple Variables](#single-template-multiple-variables)
+    - [Multi-Provider Comparison](#multi-provider-comparison)
+    - [Output Files](#output-files)
+    - [Resume Interrupted Batch](#resume-interrupted-batch)
+- [Available Optimizers](#available-optimizers)
+- [Available Providers](#available-providers)
+- [Project Structure](#project-structure)
+- [Running Tests](#running-tests)
+- [Extending the Project](#extending-the-project)
+  - [Adding a New Provider](#adding-a-new-provider)
+  - [Adding a New Optimizer](#adding-a-new-optimizer)
+- [Examples Gallery](#examples-gallery)
+  - [Observer Pattern Examples](#observer-pattern-examples)
+  - [Builder Pattern Examples](#builder-pattern-examples)
+- [License](#license)
+
 ## Features
 
 - **Multiple Optimizers**: BootstrapFewShot, BootstrapRandom, MIPROv2, GEPA, BetterTogether, COPRO, BootstrapFinetune, SIMBA
 - **Multiple LLM Providers**: Ollama, OpenAI, Anthropic, Google, OpenRouter
 - **Variable Substitution**: Configurable placeholders with preserve/substitute modes
-- **Factory Pattern**: Easy creation of providers and optimizers
-- **Pipeline Pattern**: Standard optimization workflow with caching
-- **Extensible Architecture**: Easy to add new optimizers and providers
+- **Extensible Architecture**: Factory, Strategy, and Adapter patterns for easy extension
+- **Batch Processing**: Process multiple prompts with different providers
+- **Progress Tracking**: Observer pattern for monitoring optimization
 
 ## Architecture
 
@@ -24,16 +52,21 @@ A Python project demonstrating DSPy prompt optimization techniques using Gang of
 │       │  Providers   │      │  Optimizers │                      │
 │       │  (Adapter)   │      │  (Strategy) │                      │
 │       └─────────────┘      └─────────────┘                      │
+│                                                                   │
+│       Observable (Observer) <─── Builders (Builder)              │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-| Pattern | Component | Purpose |
+| Pattern | Location | Purpose |
 |---------|-----------|---------|
-| **Adapter** | Providers | Unified interface for multiple LLM backends |
-| **Strategy** | Optimizers | Swap optimization algorithms |
-| **Factory** | Factories | Create providers and optimizers by name |
-| **Template** | Pipeline | Standard optimization workflow |
-| **Memento** | Cache | Save/restore optimization results |
+| **Adapter** | `providers/` | Unified interface for multiple LLM backends |
+| **Strategy** | `optimizers/` | Swap optimization algorithms |
+| **Factory** | `factory/` | Create providers and optimizers by name |
+| **Template** | `pipeline.py` | Standard optimization workflow |
+| **Memento** | `cache.py` | Save/restore optimization results |
+| **Command** | `commands/` | Batch processing with queue persistence |
+| **Observer** | `observers/` | Progress tracking and event handling |
+| **Builder** | `builders/` | Fluent configuration API |
 
 ## Setup
 
@@ -285,7 +318,7 @@ pending = queue.get_pending()
 print(f"Resuming {len(pending)} pending commands")
 ```
 
-### Available Optimizers
+## Available Optimizers
 
 | Optimizer | Name | Description |
 |----------|------|-------------|
@@ -298,7 +331,7 @@ print(f"Resuming {len(pending)} pending commands")
 | BootstrapFinetune | `bootstrap_finetune` | Distills prompts into weight updates for fine-tuning |
 | SIMBA | `simba` | Stochastic mini-batch ascent with self-reflective improvement |
 
-### Available Providers
+## Available Providers
 
 | Provider | Name | Environment Variables |
 |----------|------|----------------------|
@@ -347,6 +380,18 @@ dspy_examples/
 │   ├── factory/                 # Factory Pattern
 │   │   ├── provider_factory.py
 │   │   └── optimizer_factory.py
+│   ├── observers/               # Observer Pattern
+│   │   ├── __init__.py
+│   │   ├── base.py              # Observer, Event, PipelineEvent, MetricEvent
+│   │   ├── observable.py        # Observable mixin
+│   │   ├── logging_observer.py   # Console/file logging
+│   │   ├── metric_observer.py    # Metric aggregation
+│   │   ├── callback_observer.py  # User callbacks
+│   │   └── progress_observer.py  # Pipeline stage tracking
+│   ├── builders/                # Builder Pattern
+│   │   ├── __init__.py
+│   │   ├── pipeline_builder.py  # Fluent pipeline config
+│   │   └── batch_builder.py      # Fluent batch config
 │   ├── pipeline.py              # Template Pattern
 │   ├── template.py               # Variable substitution
 │   ├── cache.py                 # Memento Pattern
@@ -360,6 +405,8 @@ dspy_examples/
 │   ├── test_providers_*.py      # Provider tests
 │   ├── test_optimizers_*.py     # Optimizer tests
 │   ├── test_factory_*.py        # Factory tests
+│   ├── test_observers_*.py      # Observer tests
+│   ├── test_*_builder.py        # Builder tests
 │   └── test_pipeline.py         # Pipeline tests
 ├── main.py                      # Entry point
 ├── pyproject.toml
@@ -438,20 +485,9 @@ from dspy_examples.factory.optimizer_factory import OptimizerFactory
 OptimizerFactory.register("my_optimizer", MyOptimizer)
 ```
 
-## Design Patterns Used
+## Examples Gallery
 
-| Pattern | Location | Purpose |
-|---------|----------|---------|
-| **Adapter** | `providers/` | Multiple LLM backends with unified interface |
-| **Strategy** | `optimizers/` | Swap optimization algorithms |
-| **Factory** | `factory/` | Create providers & optimizers by name |
-| **Template** | `pipeline.py` | Standard optimization workflow |
-| **Memento** | `cache.py` | Save/restore results |
-| **Command** | `commands/` | Batch processing with queue persistence |
-| **Observer** | `observers/` | Progress tracking and event handling |
-| **Builder** | `builders/` | Fluent configuration API |
-
-### Observer Pattern
+### Observer Pattern Examples
 
 Track pipeline progress, collect metrics, and react to events:
 
@@ -468,24 +504,28 @@ from dspy_examples.pipeline import OptimizationPipeline
 
 # Built-in observers
 pipeline = OptimizationPipeline()
-pipeline.add_observer(LoggingObserver())  # Log pipeline events
-pipeline.add_observer(MetricObserver())   # Track token usage, timing
-pipeline.add_observer(ProgressObserver()) # Progress bar display
+pipeline.add_observer(LoggingObserver())   # Log pipeline events
+pipeline.add_observer(MetricObserver())    # Track token usage, timing
+pipeline.add_observer(ProgressObserver())  # Progress bar display
 
 # Custom observer
-class MyObserver(Observer):
-    def on_pipeline_event(self, event: PipelineEvent):
-        print(f"Pipeline {event.stage}: {event.status}")
+class TokenTracker(Observer):
+    def __init__(self):
+        self.total_tokens = 0
 
     def on_metric_event(self, event: MetricEvent):
         if event.name == "tokens_used":
-            print(f"Tokens: {event.value}")
+            self.total_tokens += event.value
 
-pipeline.add_observer(MyObserver())
+    def on_pipeline_event(self, event: PipelineEvent):
+        if event.status == "completed":
+            print(f"Pipeline completed. Total tokens: {self.total_tokens}")
+
+pipeline.add_observer(TokenTracker())
 result = pipeline.run()
 ```
 
-### Builder Pattern
+### Builder Pattern Examples
 
 Configure pipelines and batches with fluent APIs:
 
@@ -501,7 +541,7 @@ pipeline = (PipelineBuilder()
     .with_optimizer("mipro_v2")
     .with_observer(LoggingObserver())
     .with_observer(ProgressObserver())
-    .with_cache(True)
+    .with_cache(True, ttl=3600)
     .build())
 
 result = pipeline.run()

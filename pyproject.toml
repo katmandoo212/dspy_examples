@@ -3,7 +3,7 @@ name = "dspy-examples"
 version = "0.1.0"
 description = "DSPy prompt optimization examples"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.14"
 dependencies = [
     "dspy-ai>=2.5.0",
     "python-dotenv>=1.0.0",

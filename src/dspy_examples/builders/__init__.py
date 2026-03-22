@@ -1,3 +1,8 @@
-"""Builder pattern for complex configurations (Future implementation)."""
+"""Builder pattern for fluent configuration.
 
-# TODO: Implement configuration builders
+Provides fluent APIs for PipelineConfig and BatchConfig.
+"""
+
+from dspy_examples.builders.pipeline_builder import PipelineBuilder
+
+__all__ = ["PipelineBuilder"]

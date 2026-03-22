@@ -13,6 +13,7 @@ from dspy_examples.optimizers.base import OptimizationResult, OptimizerConfig
 from dspy_examples.prompts import load_prompt, save_prompt
 from dspy_examples.settings import get_settings
 from dspy_examples.template import PromptTemplate
+from dspy_examples.observers.observable import Observable
 
 
 @dataclass
@@ -28,10 +29,11 @@ class PipelineConfig:
     variables: dict[str, str] | None = None  # Variable values for substitution
 
 
-class OptimizationPipeline:
+class OptimizationPipeline(Observable):
     """Template pattern for prompt optimization workflow."""
 
     def __init__(self, config: PipelineConfig | None = None) -> None:
+        super().__init__()
         self.config = config or PipelineConfig()
         self.settings = get_settings()
         self.cache = OptimizationCache() if self.config.use_cache else None

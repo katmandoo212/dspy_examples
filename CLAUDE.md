@@ -11,6 +11,7 @@ DSPy prompt optimization examples - a collection of Python scripts demonstrating
 - **Python**: 3.13+ (specified in `.python-version`)
 - **Package Manager**: uv
 - **Virtual Environment**: Shared at `G:\home\blt\github\.venv`
+- **Git Remote**: `https://github.com/katmandoo212/dspy_examples.git`
 
 ## Development Commands
 
@@ -51,20 +52,28 @@ dspy_examples/
 │   ├── unoptimized_prompt.md    # Input prompt file
 │   └── optimized_prompt.md      # Output (auto-generated)
 ├── src/dspy_examples/
-│   ├── __init__.py              # Package init
-│   ├── config.py                # DSPy/Ollama configuration
-│   ├── prompts.py               # Prompt I/O utilities
-│   └── bootstrap_fewshot.py     # BootstrapFewShot implementation
+│   ├── providers/               # LLM Provider Adapters
+│   ├── optimizers/              # Optimization Strategies
+│   ├── factory/                 # Factory Pattern
+│   ├── pipeline.py              # Template Pattern
+│   └── cache.py                 # Memento Pattern
 ├── tests/
-│   ├── test_config.py           # Config module tests
-│   ├── test_prompts.py           # Prompts utility tests
-│   ├── test_bootstrap_fewshot.py # BootstrapFewShot tests
-│   └── test_main.py             # Main entry point tests
-├── main.py                      # Entry point
+│   ├── test_optimizer_*.py      # Optimizer tests
+│   ├── test_provider_*.py       # Provider tests
+│   └── test_*.py                # Other tests
 ├── pyproject.toml               # Project configuration
-├── .env.example                 # Environment template
 └── README.md                    # Documentation
 ```
+
+### Architecture
+
+| Pattern | Component | Purpose |
+|---------|-----------|---------|
+| **Adapter** | Providers | Unified interface for multiple LLM backends |
+| **Strategy** | Optimizers | Swap optimization algorithms |
+| **Factory** | Factories | Create providers and optimizers by name |
+| **Template** | Pipeline | Standard optimization workflow |
+| **Memento** | Cache | Save/restore optimization results |
 
 ## DSPy-Specific Notes
 
@@ -145,22 +154,41 @@ optimized = optimizer.compile(
 
 ## Adding New Optimization Techniques
 
-Each technique should be a self-contained module:
+Optimizers follow the Strategy pattern with a common interface:
 
-1. Create `src/dspy_examples/new_technique.py` with:
-   - `dspy.Signature` class defining inputs/outputs
-   - `dspy.Module` class with `forward()` method
-   - `optimize_prompt()` or similar main function
-   - `main()` function for CLI usage
+1. Create `src/dspy_examples/optimizers/new_optimizer.py`:
+   - Inherit from `PromptOptimizer` base class
+   - Implement: `optimize()`, `get_name()`, `get_description()`, `get_config()`
 
-2. Create `tests/test_new_technique.py` with:
-   - Tests for signature fields
-   - Tests for module instantiation
-   - Integration tests marked with `@pytest.mark.integration`
+2. Create `tests/test_optimizer_new_optimizer.py`:
+   - Test: `get_name()`, `get_description()`, `get_config()`
+   - Test: custom config values
+   - Test: inheritance from `PromptOptimizer`
 
-3. Update `main.py` to call the new technique
+3. Register in `src/dspy_examples/optimizers/__init__.py`:
+   - Add import and export to `__all__`
 
-4. Add documentation to `README.md`
+4. Register in `src/dspy_examples/factory/optimizer_factory.py`:
+   - Add to `_optimizers` dict
+
+5. Update `README.md` Available Optimizers table
+
+## MIPROv2 Optimizer
+
+MIPROv2 uses Bayesian optimization for instructions and few-shot examples.
+
+```python
+from dspy_examples.optimizers.mipro_v2 import MIPROv2Optimizer
+
+# Default: medium intensity
+optimizer = MIPROv2Optimizer()
+
+# Lighter intensity (faster, less thorough)
+optimizer = MIPROv2Optimizer(auto_mode="light")
+
+# Heavier intensity (slower, more thorough)
+optimizer = MIPROv2Optimizer(auto_mode="heavy")
+```
 
 ## Configuration
 

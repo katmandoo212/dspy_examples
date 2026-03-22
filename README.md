@@ -4,7 +4,7 @@ A Python project demonstrating DSPy prompt optimization techniques using Gang of
 
 ## Features
 
-- **Multiple Optimizers**: BootstrapFewShot, BootstrapRandom, MIPROv2, GEPA, BetterTogether
+- **Multiple Optimizers**: BootstrapFewShot, BootstrapRandom, MIPROv2, GEPA, BetterTogether, COPRO, BootstrapFinetune, SIMBA
 - **Multiple LLM Providers**: Ollama, OpenAI, Anthropic, Google, OpenRouter
 - **Factory Pattern**: Easy creation of providers and optimizers
 - **Pipeline Pattern**: Standard optimization workflow with caching
@@ -130,6 +130,9 @@ print(OptimizerFactory.list_optimizers())
 | MIPROv2 | `mipro_v2` | Uses Bayesian optimization for instructions and few-shot examples |
 | GEPA | `gepa` | Reflective prompt evolution with Pareto-based candidate selection |
 | BetterTogether | `better_together` | Combines prompt optimization with fine-tuning for compound improvements |
+| COPRO | `copro` | Coordinate ascent for instruction optimization (hill-climbing) |
+| BootstrapFinetune | `bootstrap_finetune` | Distills prompts into weight updates for fine-tuning |
+| SIMBA | `simba` | Stochastic mini-batch ascent with self-reflective improvement |
 
 ### Available Providers
 
@@ -162,7 +165,10 @@ dspy_examples/
 │   │   ├── bootstrap_random.py
 │   │   ├── mipro_v2.py
 │   │   ├── gepa.py
-│   │   └── better_together.py
+│   │   ├── better_together.py
+│   │   ├── copro.py
+│   │   ├── bootstrap_finetune.py
+│   │   └── simba.py
 │   ├── factory/                 # Factory Pattern
 │   │   ├── provider_factory.py
 │   │   └── optimizer_factory.py

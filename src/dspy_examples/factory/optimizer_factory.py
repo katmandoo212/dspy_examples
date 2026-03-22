@@ -6,6 +6,9 @@ from dspy_examples.optimizers.bootstrap_random import BootstrapRandomOptimizer
 from dspy_examples.optimizers.mipro_v2 import MIPROv2Optimizer
 from dspy_examples.optimizers.gepa import GEPAOptimizer
 from dspy_examples.optimizers.better_together import BetterTogetherOptimizer
+from dspy_examples.optimizers.copro import COPROOptimizer
+from dspy_examples.optimizers.bootstrap_finetune import BootstrapFinetuneOptimizer
+from dspy_examples.optimizers.simba import SIMBAOptimizer
 
 
 class OptimizerFactory:
@@ -17,6 +20,9 @@ class OptimizerFactory:
         "mipro_v2": MIPROv2Optimizer,
         "gepa": GEPAOptimizer,
         "better_together": BetterTogetherOptimizer,
+        "copro": COPROOptimizer,
+        "bootstrap_finetune": BootstrapFinetuneOptimizer,
+        "simba": SIMBAOptimizer,
     }
 
     @classmethod

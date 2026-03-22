@@ -14,6 +14,9 @@ def test_optimizer_factory_list_optimizers():
     assert "mipro_v2" in optimizers
     assert "gepa" in optimizers
     assert "better_together" in optimizers
+    assert "copro" in optimizers
+    assert "bootstrap_finetune" in optimizers
+    assert "simba" in optimizers
 
 
 def test_optimizer_factory_create_bootstrap_fewshot():
@@ -73,6 +76,42 @@ def test_optimizer_factory_create_better_together():
     assert optimizer.get_name() == "better_together"
     assert optimizer.get_strategy() == "p -> w"
     assert optimizer.get_prompt_optimizer() == "bootstrap_random"
+
+
+def test_optimizer_factory_create_copro():
+    """Test creating COPRO optimizer via factory."""
+    from dspy_examples.factory.optimizer_factory import OptimizerFactory
+    from dspy_examples.optimizers.copro import COPROOptimizer
+
+    optimizer = OptimizerFactory.create("copro")
+
+    assert isinstance(optimizer, COPROOptimizer)
+    assert optimizer.get_name() == "copro"
+    assert optimizer.get_breadth() == 10
+
+
+def test_optimizer_factory_create_bootstrap_finetune():
+    """Test creating BootstrapFinetune optimizer via factory."""
+    from dspy_examples.factory.optimizer_factory import OptimizerFactory
+    from dspy_examples.optimizers.bootstrap_finetune import BootstrapFinetuneOptimizer
+
+    optimizer = OptimizerFactory.create("bootstrap_finetune")
+
+    assert isinstance(optimizer, BootstrapFinetuneOptimizer)
+    assert optimizer.get_name() == "bootstrap_finetune"
+    assert optimizer.get_multitask() is True
+
+
+def test_optimizer_factory_create_simba():
+    """Test creating SIMBA optimizer via factory."""
+    from dspy_examples.factory.optimizer_factory import OptimizerFactory
+    from dspy_examples.optimizers.simba import SIMBAOptimizer
+
+    optimizer = OptimizerFactory.create("simba")
+
+    assert isinstance(optimizer, SIMBAOptimizer)
+    assert optimizer.get_name() == "simba"
+    assert optimizer.get_bsize() == 32
 
 
 def test_optimizer_factory_create_with_config():

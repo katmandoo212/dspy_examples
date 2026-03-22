@@ -8,6 +8,9 @@ Supports:
 
 from dspy_examples.commands.base import Command, CommandResult
 from dspy_examples.commands.nodes import LoadPromptNode, OptimizeNode, SaveResultNode
+from dspy_examples.commands.queue import CommandQueue
+from dspy_examples.commands.flows import BatchConfig, BatchFlow
+from dspy_examples.commands.results import BatchResult, ResultsAggregator
 
 __all__ = [
     "Command",
@@ -15,4 +18,9 @@ __all__ = [
     "LoadPromptNode",
     "OptimizeNode",
     "SaveResultNode",
+    "CommandQueue",
+    "BatchConfig",
+    "BatchFlow",
+    "BatchResult",
+    "ResultsAggregator",
 ]

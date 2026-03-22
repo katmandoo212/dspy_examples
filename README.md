@@ -448,8 +448,75 @@ OptimizerFactory.register("my_optimizer", MyOptimizer)
 | **Template** | `pipeline.py` | Standard optimization workflow |
 | **Memento** | `cache.py` | Save/restore results |
 | **Command** | `commands/` | Batch processing with queue persistence |
-| **Observer** | `observers/` | (Future) Progress tracking |
-| **Builder** | `builders/` | (Future) Complex configurations |
+| **Observer** | `observers/` | Progress tracking and event handling |
+| **Builder** | `builders/` | Fluent configuration API |
+
+### Observer Pattern
+
+Track pipeline progress, collect metrics, and react to events:
+
+```python
+from dspy_examples.observers import (
+    LoggingObserver,
+    MetricObserver,
+    ProgressObserver,
+    Observer,
+    PipelineEvent,
+    MetricEvent,
+)
+from dspy_examples.pipeline import OptimizationPipeline
+
+# Built-in observers
+pipeline = OptimizationPipeline()
+pipeline.add_observer(LoggingObserver())  # Log pipeline events
+pipeline.add_observer(MetricObserver())   # Track token usage, timing
+pipeline.add_observer(ProgressObserver()) # Progress bar display
+
+# Custom observer
+class MyObserver(Observer):
+    def on_pipeline_event(self, event: PipelineEvent):
+        print(f"Pipeline {event.stage}: {event.status}")
+
+    def on_metric_event(self, event: MetricEvent):
+        if event.name == "tokens_used":
+            print(f"Tokens: {event.value}")
+
+pipeline.add_observer(MyObserver())
+result = pipeline.run()
+```
+
+### Builder Pattern
+
+Configure pipelines and batches with fluent APIs:
+
+```python
+from dspy_examples.builders import PipelineBuilder, BatchBuilder
+from dspy_examples.observers import LoggingObserver, ProgressObserver
+
+# PipelineBuilder for single optimization
+pipeline = (PipelineBuilder()
+    .with_prompt("prompts/question.md")
+    .with_output("prompts/optimized.md")
+    .with_provider("openai", model="gpt-4")
+    .with_optimizer("mipro_v2")
+    .with_observer(LoggingObserver())
+    .with_observer(ProgressObserver())
+    .with_cache(True)
+    .build())
+
+result = pipeline.run()
+
+# BatchBuilder for batch processing
+batch = (BatchBuilder()
+    .with_prompts(["prompts/q1.md", "prompts/q2.md"])
+    .with_provider("openai", model="gpt-4")
+    .with_provider("ollama", model="llama3")
+    .with_optimizer("bootstrap_fewshot")
+    .with_output_dir("prompts/output")
+    .build())
+
+result = batch.run()
+```
 
 ## License
 

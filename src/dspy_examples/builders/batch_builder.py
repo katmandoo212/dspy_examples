@@ -87,7 +87,7 @@ class BatchBuilder:
 
         Args:
             name: Provider name
-            model: Optional model name (currently unused)
+            model: Optional model name to use for this provider
 
         Returns:
             Self for method chaining
@@ -139,5 +139,14 @@ class BatchBuilder:
 
         Returns:
             Configured BatchCommand
+
+        Note:
+            Observers are collected via with_observer() but are not currently
+            attached to BatchCommand. Observer support for BatchCommand is
+            planned for a future release. See TODO in BatchCommand class.
         """
+        # TODO: Attach observers when BatchCommand supports Observable mixin
+        # For now, observers are collected but not used. This maintains API
+        # consistency with PipelineBuilder while BatchCommand observer support
+        # is being developed.
         return BatchCommand(self._config)

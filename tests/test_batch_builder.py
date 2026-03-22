@@ -74,3 +74,62 @@ class TestBatchBuilder:
             .with_observer(observer))
 
         assert observer in builder._observers
+
+    def test_builder_with_provider_model(self):
+        """Test builder with provider and model."""
+        from dspy_examples.builders import BatchBuilder
+
+        # Note: BatchConfig has default provider [{"name": "ollama"}]
+        # with_provider appends to the existing list
+        builder = BatchBuilder().with_provider("openai", model="gpt-4")
+
+        assert len(builder._config.providers) == 2
+        # First provider is the default
+        assert builder._config.providers[0] == {"name": "ollama"}
+        # Second provider is the one we added
+        assert builder._config.providers[1] == {"name": "openai", "model": "gpt-4"}
+
+    def test_builder_with_provider_no_model(self):
+        """Test builder with provider without model."""
+        from dspy_examples.builders import BatchBuilder
+
+        # Note: BatchConfig has default provider [{"name": "ollama"}]
+        builder = BatchBuilder().with_provider("openai")
+
+        assert len(builder._config.providers) == 2
+        # First provider is the default
+        assert builder._config.providers[0] == {"name": "ollama"}
+        # Second provider is the one we added
+        assert builder._config.providers[1] == {"name": "openai"}
+
+    def test_builder_with_provider_replaces_default(self):
+        """Test that with_providers() replaces the default provider."""
+        from dspy_examples.builders import BatchBuilder
+
+        # with_providers replaces the entire list
+        builder = BatchBuilder().with_providers(["openai"])
+
+        assert len(builder._config.providers) == 1
+        assert builder._config.providers[0] == {"name": "openai"}
+
+    def test_builder_observer_not_yet_attached(self):
+        """Test that observers are collected but not attached (documented limitation).
+
+        This test documents that BatchCommand does not yet support observers.
+        When BatchCommand gains observer support, this test should be updated.
+        """
+        from dspy_examples.builders import BatchBuilder
+        from dspy_examples.observers import LoggingObserver
+
+        observer = LoggingObserver()
+        builder = (BatchBuilder()
+            .with_prompts(["test.md"])
+            .with_observer(observer))
+
+        batch = builder.build()
+
+        # Observer was collected by builder
+        assert observer in builder._observers
+        # But BatchCommand does not yet have observer support
+        # (this documents the current limitation)
+        assert not hasattr(batch, "_observers") or observer not in getattr(batch, "_observers", [])

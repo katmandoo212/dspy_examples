@@ -20,6 +20,7 @@ def test_pipeline_config_defaults():
     assert config.output_path == Path("prompts/optimized_prompt.md")
     assert config.use_cache is True
     assert config.trainset is None
+    assert config.variables is None
 
 
 def test_pipeline_get_cache_key():
@@ -37,8 +38,8 @@ def test_pipeline_get_cache_key():
     assert len(key1) == 16  # SHA256 truncated to 16 chars
 
 
-def test_pipeline_load_prompt():
-    """Test loading prompt from file."""
+def test_pipeline_load_prompt_with_variables():
+    """Test loading prompt with variable substitution."""
     from dspy_examples.pipeline import OptimizationPipeline, PipelineConfig
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -50,9 +51,39 @@ def test_pipeline_load_prompt():
             use_cache=False,
         )
         pipeline = OptimizationPipeline(config)
-        prompt = pipeline._load_prompt()
+        prompt, template = pipeline._load_prompt_with_variables({})
 
         assert prompt == "Test prompt content"
+        # Template exists but has no variables (plain prompt)
+        assert template is not None
+        assert len(template.variables) == 0
+
+
+def test_pipeline_load_prompt_with_frontmatter():
+    """Test loading prompt with frontmatter and variables."""
+    from dspy_examples.pipeline import OptimizationPipeline, PipelineConfig
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        input_file = Path(tmpdir) / "test_prompt.md"
+        input_file.write_text("""---
+variables:
+  country:
+    mode: preserve
+    default: France
+---
+
+What is the capital of [[country]]?""")
+
+        config = PipelineConfig(
+            input_path=input_file,
+            use_cache=False,
+        )
+        pipeline = OptimizationPipeline(config)
+        prompt, template = pipeline._load_prompt_with_variables({})
+
+        assert "What is the capital of France?" in prompt
+        assert template is not None
+        assert "country" in template.variables
 
 
 def test_pipeline_save_result():

@@ -6,6 +6,7 @@ A Python project demonstrating DSPy prompt optimization techniques using Gang of
 
 - **Multiple Optimizers**: BootstrapFewShot, BootstrapRandom, MIPROv2, GEPA, BetterTogether, COPRO, BootstrapFinetune, SIMBA
 - **Multiple LLM Providers**: Ollama, OpenAI, Anthropic, Google, OpenRouter
+- **Variable Substitution**: Configurable placeholders with preserve/substitute modes
 - **Factory Pattern**: Easy creation of providers and optimizers
 - **Pipeline Pattern**: Standard optimization workflow with caching
 - **Extensible Architecture**: Easy to add new optimizers and providers
@@ -121,6 +122,82 @@ print(ProviderFactory.list_providers())
 print(OptimizerFactory.list_optimizers())
 ```
 
+### Variable Substitution
+
+Prompts can contain variables using configurable delimiters (default `[[ ]]`):
+
+```markdown
+---
+delimiter: "[[ ]]"
+variables:
+  country:
+    mode: preserve
+    default: USA
+  tone:
+    mode: substitute
+    default: professional
+---
+
+You are a geography expert. Answer questions about [[country]] in a [[tone]] manner.
+```
+
+**Variable Modes:**
+- `preserve`: Placeholder retained in optimized output
+- `substitute`: Permanently replaced with value
+
+**Usage:**
+
+```python
+from dspy_examples.pipeline import OptimizationPipeline, PipelineConfig
+
+# Variables from config
+config = PipelineConfig(
+    input_path=Path("prompts/template.md"),
+    variables={"country": "Japan"}
+)
+
+# Or variables at runtime
+pipeline = OptimizationPipeline(config)
+result = pipeline.run(variables={"country": "France", "tone": "casual"})
+```
+
+**Delimiter Configuration:**
+
+Project-wide default in `.env`:
+```
+VARIABLE_DELIMITER_START=[[
+VARIABLE_DELIMITER_END=]]
+```
+
+Per-prompt override in frontmatter:
+```yaml
+---
+delimiter: "${ }"
+---
+
+Discuss ${topic} in detail.
+```
+
+**PromptTemplate API:**
+
+```python
+from dspy_examples.template import PromptTemplate
+
+# Load and parse
+template = PromptTemplate.from_file("prompt.md")
+
+# Validate
+errors = template.validate({"country": "France"})
+if errors:
+    print(f"Validation errors: {errors}")
+
+# Substitute
+prompt = template.substitute({"country": "France", "tone": "formal"})
+
+# Check preserved variables
+preserved = template.get_preserved_variables()  # ['country']
+```
+
 ### Available Optimizers
 
 | Optimizer | Name | Description |
@@ -173,6 +250,7 @@ dspy_examples/
 │   │   ├── provider_factory.py
 │   │   └── optimizer_factory.py
 │   ├── pipeline.py              # Template Pattern
+│   ├── template.py               # Variable substitution
 │   ├── cache.py                 # Memento Pattern
 │   ├── config.py                # DSPy configuration
 │   ├── settings.py              # Pydantic Settings

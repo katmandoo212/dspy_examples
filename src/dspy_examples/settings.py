@@ -4,6 +4,8 @@ from typing import Literal
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from dspy_examples.template import DelimiterConfig
+
 
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
@@ -42,9 +44,24 @@ class Settings(BaseSettings):
     max_bootstrapped_demos: int = 3
     max_labeled_demos: int = 3
 
+    # Variable Substitution Configuration
+    variable_delimiter_start: str = "[["
+    variable_delimiter_end: str = "]]"
+
     # Cache Configuration
     use_cache: bool = True
     cache_dir: str = ".cache/optimizations"
+
+    def get_delimiter_config(self) -> DelimiterConfig:
+        """Get the delimiter configuration.
+
+        Returns:
+            DelimiterConfig with start and end delimiters.
+        """
+        return DelimiterConfig(
+            start=self.variable_delimiter_start,
+            end=self.variable_delimiter_end,
+        )
 
 
 # Module-level singleton

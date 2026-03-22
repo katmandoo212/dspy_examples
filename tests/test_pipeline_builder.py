@@ -95,3 +95,40 @@ class TestPipelineBuilder:
                 .build())
 
             assert observer in pipeline._observers
+
+    def test_builder_with_output(self):
+        """Test builder with output path."""
+        from dspy_examples.builders import PipelineBuilder
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output_file = Path(tmpdir) / "output.md"
+
+            builder = PipelineBuilder().with_output(output_file)
+
+            assert builder._config.output_path == output_file
+
+    def test_builder_with_variables(self):
+        """Test builder with template variables."""
+        from dspy_examples.builders import PipelineBuilder
+
+        variables = {"name": "test", "version": "1.0"}
+        builder = PipelineBuilder().with_variables(variables)
+
+        assert builder._config.variables == variables
+
+    def test_builder_with_cache_disabled(self):
+        """Test builder with cache disabled."""
+        from dspy_examples.builders import PipelineBuilder
+
+        builder = PipelineBuilder().with_cache(use_cache=False)
+
+        assert builder._config.use_cache is False
+
+    def test_builder_with_cache_ttl(self):
+        """Test builder with cache TTL."""
+        from dspy_examples.builders import PipelineBuilder
+
+        builder = PipelineBuilder().with_cache(use_cache=True, ttl=300)
+
+        assert builder._config.use_cache is True
+        assert builder._config.cache_ttl == 300

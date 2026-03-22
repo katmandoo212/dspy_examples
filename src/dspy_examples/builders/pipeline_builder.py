@@ -12,13 +12,9 @@ Usage:
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 from dspy_examples.pipeline import OptimizationPipeline, PipelineConfig
 from dspy_examples.observers import Observer
-
-if TYPE_CHECKING:
-    pass
 
 
 class PipelineBuilder:
@@ -68,15 +64,19 @@ class PipelineBuilder:
 
         Args:
             name: Provider name (e.g., "openai", "ollama", "anthropic")
-            model: Optional model name
+            model: Optional model name (currently unused, reserved for future use)
 
         Returns:
             Self for method chaining
+
+        Note:
+            Model configuration is currently handled via environment variables.
+            The model parameter is accepted for API consistency but not yet used.
+            Future implementation may store model name in PipelineConfig.
         """
         self._config.provider_name = name
-        if model:
-            # Model is set via environment variable or config
-            pass
+        # TODO: Store model name in config when PipelineConfig supports it
+        _ = model  # Acknowledge parameter to satisfy linters
         return self
 
     def with_optimizer(self, name: str) -> "PipelineBuilder":

@@ -198,6 +198,93 @@ prompt = template.substitute({"country": "France", "tone": "formal"})
 preserved = template.get_preserved_variables()  # ['country']
 ```
 
+### Batch Processing
+
+Process multiple prompts with different providers and configurations:
+
+#### Multiple Prompts, Single Provider
+
+```python
+from dspy_examples.commands import BatchCommand, BatchConfig
+from pathlib import Path
+
+config = BatchConfig(
+    prompt_paths=[
+        Path("prompts/question.md"),
+        Path("prompts/summary.md"),
+    ],
+    providers=[{"name": "openai", "model": "gpt-4"}],
+    optimizer_name="bootstrap_fewshot",
+)
+
+batch = BatchCommand(config)
+result = batch.run()
+print(f"Successful: {result['successful']}/{result['total_commands']}")
+```
+
+#### Single Template, Multiple Variables
+
+```python
+config = BatchConfig(
+    prompt_template=Path("prompts/geography.md"),
+    variable_sets=[
+        {"country": "France", "tone": "formal"},
+        {"country": "Japan", "tone": "casual"},
+    ],
+    providers=[{"name": "ollama"}],
+    optimizer_name="mipro_v2",
+)
+
+batch = BatchCommand(config)
+result = batch.run()
+```
+
+#### Multi-Provider Comparison
+
+```python
+config = BatchConfig(
+    prompt_paths=[Path("prompts/question.md")],
+    providers=[
+        {"name": "openai", "model": "gpt-4"},
+        {"name": "anthropic", "model": "claude-3-opus"},
+        {"name": "google", "model": "gemini-pro"},
+        {"name": "ollama", "model": "llama3"},
+    ],
+    optimizer_name="gepa",
+    max_concurrent=3,
+)
+
+batch = BatchCommand(config)
+result = batch.run()
+
+# Compare providers
+for provider, stats in result.get("by_provider", {}).items():
+    print(f"{provider}: {stats['avg_time']:.1f}s, {stats['success_rate']:.0%}")
+```
+
+#### Output Files
+
+Batch processing creates:
+```
+prompts/batch_output/
+├── batch_abc123_report.md          # Summary report
+├── batch_abc123_results.json       # Full results
+├── question_openai_gpt4_bootstrap.md
+├── question_ollama_llama3_bootstrap.md
+└── ...
+```
+
+#### Resume Interrupted Batch
+
+```python
+from dspy_examples.commands import CommandQueue
+from pathlib import Path
+
+queue = CommandQueue(Path(".cache/batch_commands.db"))
+pending = queue.get_pending()
+print(f"Resuming {len(pending)} pending commands")
+```
+
 ### Available Optimizers
 
 | Optimizer | Name | Description |
@@ -229,6 +316,17 @@ dspy_examples/
 │   ├── unoptimized_prompt.md    # Input prompts
 │   └── optimized_prompt.md      # Output (optimized)
 ├── src/dspy_examples/
+│   ├── pocketflow/              # Embedded PocketFlow for orchestration
+│   │   ├── __init__.py
+│   │   └── core.py              # Node, Flow, BatchNode, BatchFlow
+│   ├── commands/                # Command pattern for batch processing
+│   │   ├── __init__.py
+│   │   ├── base.py              # Command, CommandResult
+│   │   ├── nodes.py             # OptimizeNode, LoadPromptNode
+│   │   ├── flows.py             # BatchConfig, BatchFlow
+│   │   ├── queue.py             # SQLite persistence
+│   │   ├── results.py           # ResultsAggregator, BatchResult
+│   │   └── batch.py             # BatchCommand API
 │   ├── providers/               # LLM Provider Adapters
 │   │   ├── base.py              # LMProvider interface
 │   │   ├── ollama.py
@@ -257,6 +355,8 @@ dspy_examples/
 │   ├── prompts.py               # Prompt I/O utilities
 │   └── bootstrap_fewshot.py     # Legacy entry point
 ├── tests/
+│   ├── test_pocketflow_*.py     # PocketFlow tests
+│   ├── test_commands_*.py       # Command tests
 │   ├── test_providers_*.py      # Provider tests
 │   ├── test_optimizers_*.py     # Optimizer tests
 │   ├── test_factory_*.py        # Factory tests
@@ -347,7 +447,7 @@ OptimizerFactory.register("my_optimizer", MyOptimizer)
 | **Factory** | `factory/` | Create providers & optimizers by name |
 | **Template** | `pipeline.py` | Standard optimization workflow |
 | **Memento** | `cache.py` | Save/restore results |
-| **Command** | `commands/` | (Future) Batch processing |
+| **Command** | `commands/` | Batch processing with queue persistence |
 | **Observer** | `observers/` | (Future) Progress tracking |
 | **Builder** | `builders/` | (Future) Complex configurations |
 

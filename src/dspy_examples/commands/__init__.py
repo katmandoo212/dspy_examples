@@ -7,5 +7,12 @@ Supports:
 """
 
 from dspy_examples.commands.base import Command, CommandResult
+from dspy_examples.commands.nodes import LoadPromptNode, OptimizeNode, SaveResultNode
 
-__all__ = ["Command", "CommandResult"]
+__all__ = [
+    "Command",
+    "CommandResult",
+    "LoadPromptNode",
+    "OptimizeNode",
+    "SaveResultNode",
+]

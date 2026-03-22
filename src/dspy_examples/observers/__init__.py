@@ -1,3 +1,10 @@
-"""Observer pattern for progress tracking (Future implementation)."""
+"""Observer pattern for progress tracking and event handling."""
 
-# TODO: Implement progress observers
+from dspy_examples.observers.base import (
+    Observer,
+    Event,
+    PipelineEvent,
+    MetricEvent,
+)
+
+__all__ = ["Observer", "Event", "PipelineEvent", "MetricEvent"]

@@ -11,6 +11,7 @@ from dspy_examples.commands.nodes import LoadPromptNode, OptimizeNode, SaveResul
 from dspy_examples.commands.queue import CommandQueue
 from dspy_examples.commands.flows import BatchConfig, BatchFlow
 from dspy_examples.commands.results import BatchResult, ResultsAggregator
+from dspy_examples.commands.batch import BatchCommand, OptimizeCommand
 
 __all__ = [
     "Command",
@@ -23,4 +24,6 @@ __all__ = [
     "BatchFlow",
     "BatchResult",
     "ResultsAggregator",
+    "BatchCommand",
+    "OptimizeCommand",
 ]

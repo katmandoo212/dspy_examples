@@ -140,3 +140,28 @@ class TestMetricObserver:
 
         assert summary["tokens_used"] == {"value": 100, "unit": "tokens"}
         assert summary["duration_ms"] == {"value": 1500, "unit": "ms"}
+
+    def test_metric_observer_reset(self):
+        """Test resetting metrics."""
+        from dspy_examples.observers.metric_observer import MetricObserver
+        from dspy_examples.observers.base import MetricEvent
+
+        observer = MetricObserver()
+
+        event = MetricEvent(
+            name="tokens_used",
+            timestamp=datetime.now(),
+            source="optimizer",
+            data={},
+            value=100,
+            unit="tokens",
+        )
+        observer.on_metric_event(event)
+
+        assert observer.metrics == {"tokens_used": 100}
+        assert observer.units == {"tokens_used": "tokens"}
+
+        observer.reset()
+
+        assert observer.metrics == {}
+        assert observer.units == {}
